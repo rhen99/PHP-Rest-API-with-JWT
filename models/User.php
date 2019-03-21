@@ -79,28 +79,28 @@ class User {
         return false;
     }
     public function update(){
-        $set_password = !empty($this->password) ? ',password = :password': ' ';
+        $set_password = !empty($this->password) ? 'password = :password': '';
         $query = 'UPDATE '. $this->table .' SET firstname = :firstname, lastname = :lastname,
- email = :email {$set_password} WHERE id = :id';
-
+ email = :email, '. $set_password .' WHERE id = :id';
+ 
         $stmt = $this->conn->prepare($query);
 
         $this->firstname = htmlspecialchars(strip_tags($this->firstname));
         $this->lastname = htmlspecialchars(strip_tags($this->lastname));
         $this->email = htmlspecialchars(strip_tags($this->email));
-         $stmt->bindParam(':id', $this->id);
-        
         if(!empty($this->password)){
             $this->password = htmlspecialchars(strip_tags($this->password));
         }
 
+        $stmt->bindParam(':id', $this->id);
         $stmt->bindParam(':firstname', $this->firstname);
         $stmt->bindParam(':lastname', $this->lastname);
         $stmt->bindParam(':email', $this->email);
-
+        
         if(!empty($this->password)){
             $password_hash = password_hash($this->password, PASSWORD_BCRYPT);
             $stmt->bindParam(':password', $password_hash);
+            
         }
        
 
